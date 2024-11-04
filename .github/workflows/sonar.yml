@@ -25,6 +25,6 @@ jobs:
       - name: SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+          SONAR_HOST_URL: "http://localhost:9000"
         run: |
           sonar-scanner "-Dsonar.projectKey=pingeso-p09" "-Dsonar.sources=." "-Dsonar.host.url=$SONAR_HOST_URL" "-Dsonar.login=$SONAR_TOKEN"
