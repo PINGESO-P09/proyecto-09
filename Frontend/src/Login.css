@@ -1,0 +1,46 @@
+/* General container styling for the login */
+.login-container {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Card styling */
+  .login-card {
+    padding: 20px;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Logo styling */
+  .logo-img {
+    max-width: 150px; /* Aumenta el tamaño máximo del logo */
+    height: auto;
+    margin-bottom: 20px; /* Agrega un margen inferior para separación */
+  }
+  
+  /* Button styling */
+  button[type="submit"] {
+    background-color: #1a1a2e;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #e94560;
+  }
+  
+  /* Link styling */
+  .custom-link {
+    color: #1a1a2e;
+    text-decoration: none;
+  }
+  
+  .custom-link:hover {
+    color: #e94560;
+    text-decoration: underline;
+  }
+  
