@@ -39,13 +39,13 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Chat container styling */
-.chat-container {
+/* Main chat container styling for the Messages view */
+.main-chat-container {
     padding: 20px;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    height: 70vh;
+    height: 80vh; /* Increased height specific to Messages view */
     display: flex;
     flex-direction: column;
     justify-content: space-between;

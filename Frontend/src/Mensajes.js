@@ -66,11 +66,11 @@ const Mensajes = () => {
               <Nav.Link as={Link} to="/mensajes">
                 <FaEnvelope /> Mensajes
               </Nav.Link>
+              <Nav.Link as={Link} to="/documentos">
+                <FaFileAlt /> Documentos
+              </Nav.Link>
               <Nav.Link href="#proyectos">
                 <FaProjectDiagram /> Proyectos
-              </Nav.Link>
-              <Nav.Link href="#documentos">
-                <FaFileAlt /> Documentos
               </Nav.Link>
               <Nav.Link href="#actividades">
                 <FaTasks /> Actividades
@@ -113,7 +113,7 @@ const Mensajes = () => {
 
           {/* Ventana de chat */}
           <Col md={8}>
-            <Card className="chat-container">
+            <Card className="main-chat-container"> {/* Cambiado a main-chat-container */}
               <Card.Body>
                 <h5>{activeChat ? `Chat con ${activeChat.nombre}` : 'Selecciona un contacto'}</h5>
                 <div className="chat-messages">

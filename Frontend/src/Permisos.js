@@ -66,11 +66,11 @@ const Permisos = () => {
               <Nav.Link as={Link} to="/mensajes">
                 <FaEnvelope /> Mensajes
               </Nav.Link>
+              <Nav.Link as={Link} to="/documentos"> {/* Opción de Documentos añadida */}
+                <FaFileAlt /> Documentos
+              </Nav.Link>
               <Nav.Link href="#proyectos">
                 <FaProjectDiagram /> Proyectos
-              </Nav.Link>
-              <Nav.Link href="#documentos">
-                <FaFileAlt /> Documentos
               </Nav.Link>
               <Nav.Link href="#actividades">
                 <FaTasks /> Actividades
