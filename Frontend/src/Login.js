@@ -20,7 +20,7 @@ function Login() {
           <Card className="login-card">
             <Card.Body>
               <div className="text-center mb-4">
-                <Image src="/logo.jpg" alt="Logo" className="logo-img" />
+                <Image src="/logo.png" alt="Logo" className="logo-img" />
               </div>
               <h2 className="text-center mb-4">Login</h2>
               <Form onSubmit={handleSubmit}>

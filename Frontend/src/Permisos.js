@@ -5,42 +5,34 @@ import {
   Col,
   Navbar,
   Nav,
-  Table,
   Card,
   Row,
   ListGroup,
   Form,
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { FaKey, FaUsers, FaEnvelope, FaProjectDiagram, FaFileAlt, FaTasks, FaCog } from 'react-icons/fa';
+import { FaHome, FaKey, FaUsers, FaEnvelope, FaProjectDiagram, FaFileAlt, FaTasks, FaCog } from 'react-icons/fa';
 
-const Roles = () => {
-  const [roles, setRoles] = useState([
-    { nombre: 'Socio', activo: true },
-    { nombre: 'Arquitecto', activo: false },
-    { nombre: 'Administrador', activo: false },
-  ]);
-
-  const [permisos, setPermisos] = useState([
-    { nombre: 'Modificar Documentos', asignado: true },
-    { nombre: 'Subir Documentos', asignado: true },
-    { nombre: 'Dar Permisos', asignado: true },
-    { nombre: 'Crear Roles', asignado: true },
-    { nombre: 'Crear Usuario', asignado: true },
-    { nombre: 'Mensajería', asignado: true },
-  ]);
-
+const Permisos = () => {
   const [menuVisible, setMenuVisible] = useState(true);
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
   };
 
-  const handleActivoChange = (index) => {
-    const updatedRoles = [...roles];
-    updatedRoles[index].activo = !updatedRoles[index].activo;
-    setRoles(updatedRoles);
-  };
+  const [permisos, setPermisos] = useState([
+    { nombre: 'Lectura Documentos', asignado: true },
+    { nombre: 'Edición documentos', asignado: false },
+    { nombre: 'Comentar documentos', asignado: false },
+    { nombre: 'Subir Documentos', asignado: false },
+    { nombre: 'Descargar documentos', asignado: false },
+  ]);
+
+  const [usuarios, setUsuarios] = useState([
+    { nombre: 'José Martínez', rol: 'Arquitecto', asignado: true },
+    { nombre: 'Estrella Lopez', rol: 'Socio', asignado: false },
+    { nombre: 'Pedro Parra', rol: 'Arquitecto', asignado: false },
+  ]);
 
   const handlePermisoChange = (index) => {
     const updatedPermisos = [...permisos];
@@ -48,24 +40,14 @@ const Roles = () => {
     setPermisos(updatedPermisos);
   };
 
-  const handleEliminar = (index) => {
-    const updatedRoles = [...roles];
-    updatedRoles.splice(index, 1);
-    setRoles(updatedRoles);
-  };
-
-  const handleAñadirRol = () => {
-    const nuevoRol = {
-      nombre: prompt('Introduce el nombre del nuevo rol:'),
-      activo: false,
-    };
-    if (nuevoRol.nombre) {
-      setRoles([...roles, nuevoRol]);
-    }
+  const handleUsuarioChange = (index) => {
+    const updatedUsuarios = [...usuarios];
+    updatedUsuarios[index].asignado = !updatedUsuarios[index].asignado;
+    setUsuarios(updatedUsuarios);
   };
 
   const handleGuardarCambios = () => {
-    console.log('Cambios guardados:', { roles, permisos });
+    console.log('Cambios guardados:', { permisos, usuarios });
   };
 
   return (
@@ -105,47 +87,9 @@ const Roles = () => {
         <Button variant="dark" onClick={toggleMenu} className="mb-3">
           {menuVisible ? 'Ocultar Menú' : 'Mostrar Menú'}
         </Button>
-        <h1 className="mb-4">Administrar Roles</h1>
-        <Button variant="dark" className="btn-add-role mb-3" onClick={handleAñadirRol}>
-          + Añadir Rol
-        </Button>
-        
-        <Row>
-          <Col md={8}>
-            <Card>
-              <Card.Body>
-                <Table striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th>Rol</th>
-                      <th>Activo</th>
-                      <th>Eliminar</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {roles.map((rol, index) => (
-                      <tr key={index}>
-                        <td>{rol.nombre}</td>
-                        <td>
-                          <input
-                            type="checkbox"
-                            checked={rol.activo}
-                            onChange={() => handleActivoChange(index)}
-                          />
-                        </td>
-                        <td>
-                          <Button variant="danger" onClick={() => handleEliminar(index)}>
-                            ELIMINAR
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </Card.Body>
-            </Card>
-          </Col>
+        <h1 className="mb-4">Asignar Permisos</h1>
 
+        <Row>
           <Col md={4}>
             <Card className="permissions-container">
               <Card.Body>
@@ -158,6 +102,25 @@ const Roles = () => {
                         label={permiso.nombre}
                         checked={permiso.asignado}
                         onChange={() => handlePermisoChange(index)}
+                      />
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={8}>
+            <Card>
+              <Card.Body>
+                <h5>Usuarios</h5>
+                <ListGroup variant="flush">
+                  {usuarios.map((usuario, index) => (
+                    <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                      <span>{usuario.nombre} - {usuario.rol}</span>
+                      <Form.Check
+                        type="checkbox"
+                        checked={usuario.asignado}
+                        onChange={() => handleUsuarioChange(index)}
                       />
                     </ListGroup.Item>
                   ))}
@@ -183,4 +146,4 @@ const Roles = () => {
   );
 };
 
-export default Roles;
+export default Permisos;
