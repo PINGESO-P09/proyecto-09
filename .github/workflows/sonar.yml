@@ -12,7 +12,7 @@ on:
 
 jobs:
   sonarQube:
-    runs-on: [self-hosted]
+    runs-on: [self-hosted, windows]
 
     steps:
       - name: Check out the code
@@ -27,8 +27,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: SonarQube Scan
+      - name: Set SONAR_HOST_URL and SONAR_TOKEN variables
         env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          sonar-scanner "-Dsonar.projectKey=pingeso-p09" "-Dsonar.sources=." "-Dsonar.host.url=$SONAR_HOST_URL" "-Dsonar.login=http://localhost:9000"
+          echo "SonarQube Scan Starting..."
+          sonar-scanner "-Dsonar.projectKey=pingeso-p09" `
+                         "-Dsonar.sources=." `
+                         "-Dsonar.host.url=$env:SONAR_HOST_URL" `
+                         "-Dsonar.login=$env:SONAR_TOKEN"
