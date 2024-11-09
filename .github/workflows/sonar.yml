@@ -27,7 +27,7 @@ jobs:
       - name: SQ Backend Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACK }}
-          SONAR_HOST_URL: http://localhost:9000
+          SONAR_HOST_URL: "http://localhost:9000"
 
         run: |
           sonar-scanner -X "-Dsonar.projectKey=PINGESO-P09-BACKEND" "-Dsonar.sources=backend" "-Dsonar.host.url=$SONAR_HOST_URL" "-Dsonar.login=$SONAR_TOKEN"
