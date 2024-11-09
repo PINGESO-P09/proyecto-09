@@ -23,7 +23,11 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          
+
+      - name: Debug Environment Variables
+        run: |
+          echo "SONAR_HOST_URL=$SONAR_HOST_URL"
+
       - name: SQ Backend Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACK }}
