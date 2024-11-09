@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - sonarqube-automation
   pull_request:
     branches:
       - main
+      - sonarqube-automation
 
 jobs:
   sonarQube:
