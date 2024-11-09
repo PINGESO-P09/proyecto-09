@@ -16,24 +16,24 @@ jobs:
 
     steps:
       - name: Check out the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
           java-version: '17'
           distribution: 'temurin'
-
+          
       - name: SQ Backend Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACK }}
-          SONAR_HOST_URL: "http://localhost:9000"
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
-          sonar-scanner "-Dsonar.projectKey=PINGESO-P09-BACKEND" "-Dsonar.sources=backend" "-Dsonar.host.url=$SONAR_HOST_URL" "-Dsonar.login=$SONAR_TOKEN"
+          sonar-scanner -X "-Dsonar.projectKey=PINGESO-P09-BACKEND" "-Dsonar.sources=backend" "-Dsonar.host.url=$SONAR_HOST_URL" "-Dsonar.login=$SONAR_TOKEN"
 
       - name: SQ Frontend Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONT }}
-          SONAR_HOST_URL: "http://localhost:9000"
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
-          sonar-scanner "-Dsonar.projectKey=PINGESO-P09-FRONTEND" "-Dsonar.sources=Frontend" "-Dsonar.host.url=$SONAR_HOST_URL" "-Dsonar.login=$SONAR_TOKEN"
+          sonar-scanner -X "-Dsonar.projectKey=PINGESO-P09-FRONTEND" "-Dsonar.sources=Frontend" "-Dsonar.host.url=$SONAR_HOST_URL" "-Dsonar.login=$SONAR_TOKEN"
