@@ -4,22 +4,17 @@ on:
   push:
     branches:
       - main
-      - sonarqube-automation
   pull_request:
     branches:
       - main
-      - sonarqube-automation
 
 jobs:
   sonarQube:
-    runs-on: [self-hosted, windows]
+    runs-on: [self-hosted]
 
     steps:
       - name: Check out the code
-        uses: actions/checkout@v4
-        with:
-          submodules: 'false'
-          fetch-depth: '0'
+        uses: actions/checkout@v2
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
@@ -27,13 +22,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set SONAR_HOST_URL and SONAR_TOKEN variables
+      - name: SQ Backend Scan
         env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACK }}
+          SONAR_HOST_URL: "http://localhost:9000"
         run: |
-          echo "SonarQube Scan Starting..."
-          sonar-scanner "-Dsonar.projectKey=pingeso-p09" `
-                         "-Dsonar.sources=." `
-                         "-Dsonar.host.url=$env:SONAR_HOST_URL" `
-                         "-Dsonar.login=$env:SONAR_TOKEN"
+          sonar-scanner "-Dsonar.projectKey=PINGESO-P09-BACKEND" "-Dsonar.sources=backend" "-Dsonar.host.url=$SONAR_HOST_URL" "-Dsonar.login=$SONAR_TOKEN"
+
+      - name: SQ Frontend Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONT }}
+          SONAR_HOST_URL: "http://localhost:9000"
+        run: |
+          sonar-scanner "-Dsonar.projectKey=PINGESO-P09-FRONTEND" "-Dsonar.sources=Frontend" "-Dsonar.host.url=$SONAR_HOST_URL" "-Dsonar.login=$SONAR_TOKEN"
