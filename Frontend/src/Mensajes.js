@@ -69,7 +69,7 @@ const Mensajes = () => {
               <Nav.Link as={Link} to="/documentos">
                 <FaFileAlt /> Documentos
               </Nav.Link>
-              <Nav.Link href="#proyectos">
+              <Nav.Link as={Link} to="/proyectos">
                 <FaProjectDiagram /> Proyectos
               </Nav.Link>
               <Nav.Link href="#actividades">
@@ -113,7 +113,7 @@ const Mensajes = () => {
 
           {/* Ventana de chat */}
           <Col md={8}>
-            <Card className="main-chat-container"> {/* Cambiado a main-chat-container */}
+            <Card className="main-chat-container">
               <Card.Body>
                 <h5>{activeChat ? `Chat con ${activeChat.nombre}` : 'Selecciona un contacto'}</h5>
                 <div className="chat-messages">
@@ -141,6 +141,11 @@ const Mensajes = () => {
             </Card>
           </Col>
         </Row>
+
+        {/* Footer with Logo */}
+        <footer className="footer-img-container mt-4">
+          <img src="/logo.png" alt="RosenmannLopez" className="footer-img" /> {/* Reemplaza con la ruta correcta */}
+        </footer>
       </Col>
     </div>
   );

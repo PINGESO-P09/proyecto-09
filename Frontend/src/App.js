@@ -5,6 +5,7 @@ import Roles from './Roles';
 import Permisos from './Permisos';
 import Mensajes from './Mensajes';
 import Documentos from './Documentos'; // Importa la nueva vista de Documentos
+import Proyectos from './Proyectos';
 import FloatingChat from './FloatingChat'; // Importa el chat flotante
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
           <Route path="/permisos" element={<Permisos />} />
           <Route path="/mensajes" element={<Mensajes />} />
           <Route path="/documentos" element={<Documentos />} /> {/* Nueva ruta para Documentos */}
+          <Route path="/proyectos" element={<Proyectos />} /> {/* Nueva ruta para Proyectos */}
         </Routes>
         <FloatingChat /> {/* Agrega el chat flotante aquí */}
       </div>
