@@ -1,29 +1,12 @@
 import os
-from googleapiclient.discovery import build
-from google.oauth2.service_account import Credentials
+from .google_drive_service import create_google_drive_service
 
 """
 
 OBJETIVO: Crear carpeta usando la cuenta de servicio.
 La carpeta se ubicara en la seccion de drive "Compartidos conmigo"
-(Utiliza credential.json)
 
 """
-
-# Se define la ruta a las credenciales
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CREDENTIALS_FILE = os.path.join(BASE_DIR, "credentials", "credential.json")
-
-
-# Objetivo: Establece la configuracion de autenticación de la cuenta de servicio
-def create_google_drive_service():
-    # Se define los alcances necesarios (scopes)
-    SCOPES = ["https://www.googleapis.com/auth/drive"]
-
-    # Se configuran las credenciales
-    creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=SCOPES)
-    service = build("drive", "v3", credentials=creds)
-    return service
 
 
 # Objetivo: Crear una carpeta en Google Drive

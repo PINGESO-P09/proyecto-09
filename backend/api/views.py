@@ -10,7 +10,6 @@ from .uploadfile import upload_file
 from rest_framework import status
 
 
-
 @csrf_exempt  # Se desactivar CSRF para facilitar la prueba, aunque esto no es seguro para producción
 def create_drive_folder(request):
     if request.method == "POST":
@@ -29,7 +28,7 @@ def create_drive_folder(request):
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+@method_decorator(csrf_exempt, name="dispatch")
 class upload_file_drive(APIView):
     def post(self, request):
         file = request.FILES.get("file")  # Recibe el archivo desde el formulario
