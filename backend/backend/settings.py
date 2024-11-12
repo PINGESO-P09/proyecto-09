@@ -47,7 +47,6 @@ SIMPLE_JWT = {
 }
 
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -60,7 +59,7 @@ INSTALLED_APPS = [
     "api",
     "rest_framework",
     "corsheaders",
-    'user',
+    "user",
 ]
 
 MIDDLEWARE = [
