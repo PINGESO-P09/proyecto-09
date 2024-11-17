@@ -48,7 +48,7 @@ class SocioProfile(models.Model):
 
 
 @receiver(post_save, sender=Socio)
-def crearSocioProfile(sender, instance, created, **kwargs):
+def create_partner_profile(sender, instance, created, **kwargs):
     if created and instance.role == "SOCIO":
         SocioProfile.objects.create(user=instance)
 
@@ -78,6 +78,6 @@ class ArquitectoProfile(models.Model):
 
 
 @receiver(post_save, sender=Arquitecto)
-def crearArquitectoProfile(sender, instance, created, **kwargs):
+def create_architect_profile(sender, instance, created, **kwargs):
     if created and instance.role == "ARQUITECTO":
         ArquitectoProfile.objects.create(user=instance)
