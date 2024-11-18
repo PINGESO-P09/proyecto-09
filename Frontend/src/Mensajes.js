@@ -7,21 +7,31 @@ import {
   Row,
   ListGroup,
   Form,
+  Modal,
 } from 'react-bootstrap';
 
 const Mensajes = () => {
   const [activeChat, setActiveChat] = useState(null);
   const [chatMessages, setChatMessages] = useState({});
   const [messageInput, setMessageInput] = useState('');
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [tasks, setTasks] = useState([]);
+  const [reviews, setReviews] = useState([]); // Solicitudes de revisión
 
-  // Lista de contactos
   const contactos = [
     { id: 1, nombre: 'José Martínez' },
     { id: 2, nombre: 'Estrella Lopez' },
     { id: 3, nombre: 'Pedro Parra' },
   ];
 
-  // Seleccionar el contacto para abrir el chat
+  const documentos = [
+    'Informe Dimensiones',
+    'Plano 3D',
+    'Análisis Financiero',
+    'Memoria de Cálculo',
+  ];
+
   const handleSelectContact = (contact) => {
     setActiveChat(contact);
     if (!chatMessages[contact.id]) {
@@ -29,7 +39,6 @@ const Mensajes = () => {
     }
   };
 
-  // Enviar mensaje
   const handleSendMessage = () => {
     if (messageInput.trim() !== '') {
       const newMessage = { text: messageInput, sender: 'me' };
@@ -41,13 +50,40 @@ const Mensajes = () => {
     }
   };
 
+  // Agregar tarea
+  const handleAddTask = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const newTask = {
+      title: formData.get('title'),
+      description: formData.get('description'),
+      assignedTo: formData.get('assignedTo'),
+      dueDate: formData.get('dueDate'),
+    };
+    setTasks([...tasks, newTask]);
+    setShowTaskModal(false);
+  };
+
+  // Agregar solicitud de revisión
+  const handleAddReview = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const newReview = {
+      document: formData.get('document'),
+      reviewer: formData.get('reviewer'),
+      notes: formData.get('notes'),
+      deadline: formData.get('deadline'),
+    };
+    setReviews([...reviews, newReview]);
+    setShowReviewModal(false);
+  };
+
   return (
     <div className="roles-app d-flex">
       <Col xs={12} className="main-content p-4">
-        <h1 className="mb-4">Mensajería</h1>
+        <h1 className="mb-4">Mensajería y Solicitudes</h1>
 
         <Row>
-          {/* Lista de contactos */}
           <Col md={4}>
             <Card className="contactos-container">
               <Card.Body>
@@ -64,11 +100,25 @@ const Mensajes = () => {
                     </ListGroup.Item>
                   ))}
                 </ListGroup>
+                <div className="mt-4">
+                  <Button
+                    variant="primary"
+                    className="mb-2"
+                    onClick={() => setShowTaskModal(true)}
+                  >
+                    Asignar Tarea
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setShowReviewModal(true)}
+                  >
+                    Solicitar Revisión
+                  </Button>
+                </div>
               </Card.Body>
             </Card>
           </Col>
 
-          {/* Ventana de chat */}
           <Col md={8}>
             <Card className="main-chat-container">
               <Card.Body>
@@ -99,11 +149,117 @@ const Mensajes = () => {
           </Col>
         </Row>
 
-        {/* Footer with Logo */}
+        {/* Lista de Tareas */}
+        <div className="mt-4">
+          <h5>Tareas Asignadas</h5>
+          <ListGroup>
+            {tasks.map((task, index) => (
+              <ListGroup.Item key={index}>
+                <strong>{task.title}</strong>: {task.description} 
+                (Asignado a: {task.assignedTo}, Fecha límite: {task.dueDate})
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        </div>
+
+        {/* Solicitudes de Revisión */}
+        <div className="mt-4">
+          <h5>Solicitudes de Revisión</h5>
+          <ListGroup>
+            {reviews.map((review, index) => (
+              <ListGroup.Item key={index}>
+                <strong>{review.document}</strong>: {review.notes} 
+                (Revisor: {review.reviewer}, Fecha límite: {review.deadline})
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        </div>
+
         <footer className="footer-img-container mt-4">
-          <img src="/logo.png" alt="RosenmannLopez" className="footer-img" /> {/* Reemplaza con la ruta correcta */}
+          <img src="/logo.png" alt="RosenmannLopez" className="footer-img" />
         </footer>
       </Col>
+
+      {/* Modal para asignar tarea */}
+      <Modal show={showTaskModal} onHide={() => setShowTaskModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Asignar Tarea</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleAddTask}>
+            <Form.Group className="mb-3">
+              <Form.Label>Título</Form.Label>
+              <Form.Control name="title" type="text" placeholder="Título de la tarea" required />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Descripción</Form.Label>
+              <Form.Control name="description" as="textarea" rows={3} placeholder="Detalles de la tarea" required />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Asignar a</Form.Label>
+              <Form.Control name="assignedTo" as="select" required>
+                <option value="">Seleccionar...</option>
+                {contactos.map((contact) => (
+                  <option key={contact.id} value={contact.nombre}>
+                    {contact.nombre}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Fecha límite</Form.Label>
+              <Form.Control name="dueDate" type="date" required />
+            </Form.Group>
+            <Button variant="primary" type="submit">
+              Asignar Tarea
+            </Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
+      {/* Modal para solicitar revisión */}
+      <Modal show={showReviewModal} onHide={() => setShowReviewModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Solicitar Revisión</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleAddReview}>
+            <Form.Group className="mb-3">
+              <Form.Label>Documento</Form.Label>
+              <Form.Control name="document" as="select" required>
+                <option value="">Seleccionar documento...</option>
+                {documentos.map((doc, index) => (
+                  <option key={index} value={doc}>
+                    {doc}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Revisor</Form.Label>
+              <Form.Control name="reviewer" as="select" required>
+                <option value="">Seleccionar...</option>
+                {contactos.map((contact) => (
+                  <option key={contact.id} value={contact.nombre}>
+                    {contact.nombre}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Notas</Form.Label>
+              <Form.Control name="notes" as="textarea" rows={3} placeholder="Detalles adicionales" />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Fecha límite</Form.Label>
+              <Form.Control name="deadline" type="date" required />
+            </Form.Group>
+            <Button variant="primary" type="submit">
+              Solicitar Revisión
+            </Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };
