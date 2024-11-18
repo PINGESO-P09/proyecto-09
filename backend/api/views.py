@@ -1,18 +1,64 @@
-import json
-import tempfile
-import os
-from .createfolder import create_folder
-from .uploadfile import upload_file
-from rest_framework import status
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import status
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from googleapiclient.errors import HttpError
+import json
+from .createfolder import create_folder
+from .uploadfile import upload_file
 
-@csrf_exempt  # Se desactiva CSRF para facilitar la prueba, aunque esto no es seguro para producción
+@csrf_exempt
+@api_view(['POST'])
+def login_or_register(request):
+    """
+    Vista que permite iniciar sesión o registrar un usuario.
+    Si el usuario existe, intenta iniciar sesión. 
+    Si el usuario no existe, lo registra y luego inicia sesión automáticamente.
+    """
+    username = request.data.get('username')
+    email = request.data.get('email')
+    password = request.data.get('password')
+
+    # Autenticación de usuario existente
+    user = authenticate(username=username, password=password)
+    if user:
+        # Generar tokens JWT si el usuario ya existe
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "message": "Inicio de sesión exitoso"
+        }, status=status.HTTP_200_OK)
+
+    # Si el usuario no existe, crearlo
+    if not User.objects.filter(username=username).exists():
+        user = User.objects.create(
+            username=username,
+            email=email,
+            password=password  # La contraseña se debe cifrar automáticamente con un middleware
+        )
+        user.set_password(password)  # Encripta la contraseña
+        user.save()
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "message": "Registro y autenticación exitosos"
+        }, status=status.HTTP_201_CREATED)
+
+    return Response({"error": "Credenciales incorrectas o el usuario ya existe"},
+                    status=status.HTTP_400_BAD_REQUEST)
+
+@csrf_exempt
 def create_drive_folder(request):
+    """
+    Vista para crear una carpeta en Google Drive.
+    """
     if request.method == "POST":
         # Obtener el nombre de la carpeta de la solicitud
         data = json.loads(request.body.decode("utf-8"))
@@ -24,20 +70,18 @@ def create_drive_folder(request):
             return JsonResponse(
                 {"folder_id": folder_id, "message": "Folder created successfully"}
             )
-        except HttpError as e:
-            return JsonResponse({"error": f"Google API error: {e}"}, status=500)
         except Exception as e:
-            return JsonResponse({"error": f"Unexpected error: {e}"}, status=500)
+            return JsonResponse({"error": str(e)}, status=500)
     return JsonResponse({"error": "Invalid request method"}, status=400)
-
 
 @method_decorator(csrf_exempt, name="dispatch")
 class upload_file_drive(APIView):
+    """
+    Clase para manejar la subida de archivos a Google Drive.
+    """
     def post(self, request):
         file = request.FILES.get("file")  # Recibe el archivo desde el formulario
-        folder_id = request.data.get(
-            "folder_id", None
-        )  # Opcional: ID de la carpeta de Google Drive
+        folder_id = request.data.get("folder_id", None)  # Opcional: ID de la carpeta de Google Drive
 
         if not file:
             return Response(
@@ -45,30 +89,20 @@ class upload_file_drive(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Guardar temporalmente el archivo de manera segura
-        try:
-            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                for chunk in file.chunks():
-                    temp_file.write(chunk)
-                temp_file_path = temp_file.name
+        # Guardar temporalmente el archivo
+        file_path = f"/tmp/{file.name}"
+        with open(file_path, "wb") as f:
+            for chunk in file.chunks():
+                f.write(chunk)
 
+        try:
             # Subir el archivo a Google Drive
-            file_id = upload_file(temp_file_path, folder_id)
+            file_id = upload_file(file_path, folder_id)
             return Response(
                 {"message": "Archivo subido exitosamente", "file_id": file_id},
                 status=status.HTTP_200_OK,
             )
-        except HttpError as exp:
+        except Exception as e:
             return Response(
-                {"error": f"Google API error: {exp}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        except Exception as exp:
-            return Response(
-                {"error": f"Unexpected error: {exp}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-        finally:
-            # Asegurarse de que el archivo temporal se elimine después de su uso
-            if os.path.exists(temp_file_path):
-                os.remove(temp_file_path)
