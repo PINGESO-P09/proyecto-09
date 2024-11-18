@@ -3,18 +3,15 @@ import './Documentos.css';
 import {
   Button,
   Col,
-  Navbar,
-  Nav,
   Card,
   Table,
   Form,
   Dropdown,
+  Modal
 } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { FaKey, FaUsers, FaEnvelope, FaProjectDiagram, FaFileAlt, FaTasks, FaCog, FaUpload, FaFolderPlus, FaBell, FaEdit, FaEllipsisH, FaTrash, FaDownload, FaExternalLinkAlt, FaPencilAlt } from 'react-icons/fa';
+import { FaUpload, FaFolderPlus, FaEdit, FaEllipsisH, FaTrash, FaDownload, FaExternalLinkAlt, FaPencilAlt } from 'react-icons/fa';
 
 const Documentos = () => {
-  const [menuVisible, setMenuVisible] = useState(true);
   const [documents, setDocuments] = useState([
     { folder: 'Cerrados', doc: 'Informe Dimensiones', client: 'ACME', date: '2022-01-23', type: 'Informe' },
     { folder: 'En Etapa 3', doc: 'Plano 3D', client: 'Coliseo Metropolitano', date: '2024-01-09', type: 'Plano' },
@@ -28,11 +25,23 @@ const Documentos = () => {
   const [isSortedAlphabetically, setIsSortedAlphabetically] = useState(false);
   const [isSortedByDate, setIsSortedByDate] = useState(false);
 
-  const toggleMenu = () => {
-    setMenuVisible(!menuVisible);
-  };
+  // Estados para modales
+  const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
+  const [showUploadDocumentModal, setShowUploadDocumentModal] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [selectedProject, setSelectedProject] = useState('');
+  const [selectedFolder, setSelectedFolder] = useState('');
+  const [selectedDocumentType, setSelectedDocumentType] = useState('');
 
-  // Función para ordenar alfabéticamente
+  // Estado para proyectos y carpetas simulados
+  const [proyectos] = useState([
+    { id: 1, nombre: 'Proyecto A' },
+    { id: 2, nombre: 'Proyecto B' },
+    { id: 3, nombre: 'Proyecto C' },
+  ]);
+
+  const [carpetas] = useState(['Cerrados', 'En Etapa 3', 'Activos', 'Finalizados', 'Recientes', 'En Proceso']);
+
   const handleSortAlphabetically = () => {
     const sortedDocuments = [...documents].sort((a, b) =>
       isSortedAlphabetically
@@ -41,73 +50,75 @@ const Documentos = () => {
     );
     setDocuments(sortedDocuments);
     setIsSortedAlphabetically(!isSortedAlphabetically);
-    setIsSortedByDate(false); // Reinicia el estado de ordenación por fecha
+    setIsSortedByDate(false);
   };
 
-  // Función para ordenar por fecha
   const handleSortByDate = () => {
     const sortedDocuments = [...documents].sort((a, b) =>
       isSortedByDate ? new Date(a.date) - new Date(b.date) : new Date(b.date) - new Date(a.date)
     );
     setDocuments(sortedDocuments);
     setIsSortedByDate(!isSortedByDate);
-    setIsSortedAlphabetically(false); // Reinicia el estado de ordenación alfabética
+    setIsSortedAlphabetically(false);
   };
 
-  // Función para manejar la búsqueda
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  // Filtra los documentos basados en el término de búsqueda
   const filteredDocuments = documents.filter((doc) =>
     doc.doc.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Funciones para modales
+  const openCreateFolderModal = () => setShowCreateFolderModal(true);
+  const closeCreateFolderModal = () => setShowCreateFolderModal(false);
+
+  const handleCreateFolder = () => {
+    if (newFolderName && selectedProject) {
+      const selectedProjectName = proyectos.find((p) => p.id === selectedProject)?.nombre;
+      const newFolder = { folder: newFolderName, doc: '', client: selectedProjectName, date: '', type: 'Carpeta' };
+      setDocuments([...documents, newFolder]);
+      closeCreateFolderModal();
+      setNewFolderName('');
+      setSelectedProject('');
+    } else {
+      alert("Por favor, completa todos los campos.");
+    }
+  };
+
+  // Función para abrir el modal de subir documento
+  const handleUploadDocument = (docType) => {
+    setSelectedDocumentType(docType);
+    setShowUploadDocumentModal(true);
+  };
+
+  const closeUploadDocumentModal = () => setShowUploadDocumentModal(false);
+
+  const handleConfirmUpload = () => {
+    if (selectedFolder) {
+      const newDocument = {
+        folder: selectedFolder,
+        doc: `${selectedDocumentType} nuevo`,
+        client: 'Cliente X',
+        date: new Date().toISOString().split('T')[0],
+        type: selectedDocumentType
+      };
+      setDocuments([...documents, newDocument]);
+      closeUploadDocumentModal();
+      setSelectedFolder('');
+    } else {
+      alert("Selecciona una carpeta para subir el documento.");
+    }
+  };
+
   return (
     <div className="documentos-app d-flex">
-      {/* Sidebar */}
-      {menuVisible && (
-        <Col xs={2} className="sidebar">
-          <Navbar bg="dark" variant="dark" className="flex-column">
-            <Navbar.Brand href="#">RosenmannLopez</Navbar.Brand>
-            <Nav className="flex-column">
-              <Nav.Link as={Link} to="/roles">
-                <FaUsers /> Roles
-              </Nav.Link>
-              <Nav.Link as={Link} to="/permisos">
-                <FaKey /> Asignar Permisos
-              </Nav.Link>
-              <Nav.Link as={Link} to="/mensajes">
-                <FaEnvelope /> Mensajes
-              </Nav.Link>
-              <Nav.Link as={Link} to="/documentos">
-                <FaFileAlt /> Documentos
-              </Nav.Link>
-              <Nav.Link href="/proyectos">
-                <FaProjectDiagram /> Proyectos
-              </Nav.Link>
-              <Nav.Link href="#actividades">
-                <FaTasks /> Actividades
-              </Nav.Link>
-              <Nav.Link href="#configuracion">
-                <FaCog /> Configuración
-              </Nav.Link>
-            </Nav>
-          </Navbar>
-        </Col>
-      )}
-
-      {/* Main Content */}
-      <Col xs={menuVisible ? 10 : 12} className="main-content p-4">
-        <Button variant="dark" onClick={toggleMenu} className="mb-3">
-          {menuVisible ? 'Ocultar Menú' : 'Mostrar Menú'}
-        </Button>
+      <Col xs={12} className="main-content p-4">
         
-        {/* Header with Title and Notification Bell */}
+        {/* Header with Title */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h1 className="mb-0">Administración Documentos</h1>
-          <FaBell style={{ fontSize: '24px', cursor: 'pointer' }} />
         </div>
 
         {/* Action Buttons */}
@@ -119,19 +130,19 @@ const Documentos = () => {
             <Button variant="outline-secondary" className="me-2" onClick={handleSortByDate}>
               Ordenar por Fecha {isSortedByDate ? 'Ascendente' : 'Descendente'}
             </Button>
-            <Dropdown>
+            <Dropdown onSelect={handleUploadDocument}>
               <Dropdown.Toggle variant="secondary" id="dropdown-basic">
                 <FaUpload /> Subir documento
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                <Dropdown.Item href="#/action-1">Informe</Dropdown.Item>
-                <Dropdown.Item href="#/action-2">Plano</Dropdown.Item>
-                <Dropdown.Item href="#/action-3">Excel</Dropdown.Item>
-                <Dropdown.Item href="#/action-4">Presentación</Dropdown.Item>
+                <Dropdown.Item eventKey="Informe">Informe</Dropdown.Item>
+                <Dropdown.Item eventKey="Plano">Plano</Dropdown.Item>
+                <Dropdown.Item eventKey="Excel">Excel</Dropdown.Item>
+                <Dropdown.Item eventKey="Presentación">Presentación</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           </div>
-          <Button variant="dark">
+          <Button variant="dark" onClick={openCreateFolderModal}>
             <FaFolderPlus /> Crear carpeta
           </Button>
         </div>
@@ -202,13 +213,81 @@ const Documentos = () => {
           </Card.Body>
         </Card>
 
+        {/* Modal para Crear Carpeta */}
+        <Modal show={showCreateFolderModal} onHide={closeCreateFolderModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Crear Carpeta Nueva</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Group controlId="folderName">
+              <Form.Label>Nombre de la Carpeta</Form.Label>
+              <Form.Control
+                type="text"
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group controlId="selectProject" className="mt-3">
+              <Form.Label>Seleccionar Proyecto</Form.Label>
+              <Form.Control
+                as="select"
+                value={selectedProject}
+                onChange={(e) => setSelectedProject(e.target.value)}
+              >
+                <option value="">Selecciona un proyecto</option>
+                {proyectos.map((proyecto) => (
+                  <option key={proyecto.id} value={proyecto.id}>
+                    {proyecto.nombre}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={closeCreateFolderModal}>
+              Cancelar
+            </Button>
+            <Button variant="primary" onClick={handleCreateFolder}>
+              Crear Carpeta
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Modal para Subir Documento */}
+        <Modal show={showUploadDocumentModal} onHide={closeUploadDocumentModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Subir {selectedDocumentType}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Group controlId="selectFolder">
+              <Form.Label>Seleccionar Carpeta</Form.Label>
+              <Form.Control
+                as="select"
+                value={selectedFolder}
+                onChange={(e) => setSelectedFolder(e.target.value)}
+              >
+                <option value="">Selecciona una carpeta</option>
+                {carpetas.map((folder, index) => (
+                  <option key={index} value={folder}>
+                    {folder}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={closeUploadDocumentModal}>
+              Cancelar
+            </Button>
+            <Button variant="primary" onClick={handleConfirmUpload}>
+              Subir Documento
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
         {/* Footer with Logo */}
         <footer className="mt-4 footer-img-container">
-          <img
-            src="/logo.png"
-            alt="Footer"
-            className="footer-img"
-          />
+          <img src="/logo.png" alt="Footer" className="footer-img" />
         </footer>
       </Col>
     </div>

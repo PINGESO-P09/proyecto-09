@@ -3,23 +3,13 @@ import './Roles.css';
 import {
   Button,
   Col,
-  Navbar,
-  Nav,
   Card,
   Row,
   ListGroup,
   Form,
 } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { FaHome, FaKey, FaUsers, FaEnvelope, FaProjectDiagram, FaFileAlt, FaTasks, FaCog } from 'react-icons/fa';
 
 const Permisos = () => {
-  const [menuVisible, setMenuVisible] = useState(true);
-
-  const toggleMenu = () => {
-    setMenuVisible(!menuVisible);
-  };
-
   const [permisos, setPermisos] = useState([
     { nombre: 'Lectura Documentos', asignado: true },
     { nombre: 'Edición documentos', asignado: false },
@@ -52,42 +42,8 @@ const Permisos = () => {
 
   return (
     <div className="roles-app d-flex">
-      {menuVisible && (
-        <Col xs={2} className="sidebar">
-          <Navbar bg="dark" variant="dark" className="flex-column">
-            <Navbar.Brand href="#">RosenmannLopez</Navbar.Brand>
-            <Nav className="flex-column">
-              <Nav.Link as={Link} to="/roles">
-                <FaUsers /> Roles
-              </Nav.Link>
-              <Nav.Link as={Link} to="/permisos">
-                <FaKey /> Asignar Permisos
-              </Nav.Link>
-              <Nav.Link as={Link} to="/mensajes">
-                <FaEnvelope /> Mensajes
-              </Nav.Link>
-              <Nav.Link as={Link} to="/documentos"> {/* Opción de Documentos añadida */}
-                <FaFileAlt /> Documentos
-              </Nav.Link>
-              <Nav.Link href="/proyectos">
-                <FaProjectDiagram /> Proyectos
-              </Nav.Link>
-              <Nav.Link href="#actividades">
-                <FaTasks /> Actividades
-              </Nav.Link>
-              <Nav.Link href="#configuracion">
-                <FaCog /> Configuración
-              </Nav.Link>
-            </Nav>
-          </Navbar>
-        </Col>
-      )}
-
-      <Col xs={menuVisible ? 10 : 12} className="main-content p-4">
-        <Button variant="dark" onClick={toggleMenu} className="mb-3">
-          {menuVisible ? 'Ocultar Menú' : 'Mostrar Menú'}
-        </Button>
-        <h1 className="mb-4">Asignar Permisos</h1>
+      <Col xs={12} className="main-content p-4">
+        <h1 className="mb-4">Asignación Permisos</h1>
 
         <Row>
           <Col md={4}>
