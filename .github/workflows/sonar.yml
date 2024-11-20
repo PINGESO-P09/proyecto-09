@@ -26,14 +26,14 @@ jobs:
 
       - name: SQ Backend Scan
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACK }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           cd backend
-          sonar-scanner -X "-Dsonar.login=$SONAR_TOKEN"
+          sonar-scanner "-Dsonar.login=$SONAR_TOKEN"
 
       - name: SQ frontend Scan
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONT }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
             cd frontend
             sonar-scanner "-Dsonar.login=$SONAR_TOKEN"

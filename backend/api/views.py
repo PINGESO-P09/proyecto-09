@@ -12,7 +12,6 @@ import json
 from .createfolder import create_folder
 from .uploadfile import upload_file
 
-@csrf_exempt
 @api_view(['POST'])
 def login_or_register(request):
     """
@@ -54,7 +53,6 @@ def login_or_register(request):
     return Response({"error": "Credenciales incorrectas o el usuario ya existe"},
                     status=status.HTTP_400_BAD_REQUEST)
 
-@csrf_exempt
 @api_view(['POST'])
 def create_drive_folder(request):
     """
