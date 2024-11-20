@@ -74,30 +74,21 @@ def create_drive_folder(request):
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 @api_view(['POST'])
-@method_decorator(csrf_exempt, name="dispatch")
-class UploadDriveFile(APIView):
+def uploadDriveFile(request):
     """
     Clase para manejar la subida de archivos a Google Drive.
     """
-    def post(self, request):
+    if request.method == "POST":
         file = request.FILES.get("file")  # Recibe el archivo desde el formulario
         folder_id = request.data.get("folder_id", None)  # Opcional: ID de la carpeta de Google Drive
-
         if not file:
             return Response(
                 {"error": "No se proporcionó ningún archivo"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-        # Guardar temporalmente el archivo
-        file_path = f"/tmp/{file.name}"
-        with open(file_path, "wb") as f:
-            for chunk in file.chunks():
-                f.write(chunk)
-
         try:
             # Subir el archivo a Google Drive
-            file_id = upload_file(file_path, folder_id)
+            file_id = upload_file(file, folder_id)
             return Response(
                 {"message": "Archivo subido exitosamente", "file_id": file_id},
                 status=status.HTTP_200_OK,
@@ -106,3 +97,4 @@ class UploadDriveFile(APIView):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        

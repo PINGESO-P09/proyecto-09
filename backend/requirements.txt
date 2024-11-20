@@ -1,5 +1,5 @@
 asgiref
-Django
+django
 django-cors-headers
 djangorestframework
 djangorestframework-simplejwt
@@ -12,3 +12,4 @@ google-auth
 google-auth-oauthlib
 google-api-python-client
 black
+axios
