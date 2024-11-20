@@ -29,11 +29,11 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACK }}
         run: |
           cd backend
-          sonar-scanner
+          sonar-scanner -X "-Dsonar.login=$SONAR_TOKEN"
 
       - name: SQ frontend Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONT }}
         run: |
-            cd ../frontend
-            sonar-scanner
+            cd frontend
+            sonar-scanner -X "-Dsonar.login=$SONAR_TOKEN"
