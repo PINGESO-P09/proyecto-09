@@ -36,4 +36,4 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONT }}
         run: |
             cd frontend
-            sonar-scanner -X "-Dsonar.login=$SONAR_TOKEN"
+            sonar-scanner "-Dsonar.login=$SONAR_TOKEN"
