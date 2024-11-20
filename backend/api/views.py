@@ -55,6 +55,7 @@ def login_or_register(request):
                     status=status.HTTP_400_BAD_REQUEST)
 
 @csrf_exempt
+@api_view(['POST'])
 def create_drive_folder(request):
     """
     Vista para crear una carpeta en Google Drive.
@@ -74,8 +75,9 @@ def create_drive_folder(request):
             return JsonResponse({"error": str(e)}, status=500)
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
+@api_view(['POST'])
 @method_decorator(csrf_exempt, name="dispatch")
-class upload_file_drive(APIView):
+class UploadDriveFile(APIView):
     """
     Clase para manejar la subida de archivos a Google Drive.
     """
