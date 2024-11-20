@@ -14,6 +14,16 @@ const Proyectos = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [editingProject, setEditingProject] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const [newProject, setNewProject] = useState({
+    codigo: '',
+    cliente: '',
+    correo: '',
+    fechaInicio: '',
+    fechaTermino: '',
+    estado: '',
+    inversion: '',
+  });
 
   const [proyectos, setProyectos] = useState([
     { codigo: 'IN/1001/24', cliente: 'ACME', correo: 'contact@email.com', fechaInicio: '2022-01-23', fechaTermino: '2022-02-07', estado: 'Cerrado', inversion: '$2,350.00' },
@@ -29,13 +39,49 @@ const Proyectos = () => {
     { id: 4, projectCode: 'IN/1004/24', nombre: 'Especificaciones Técnicas', cliente: 'Mausoleo Colón', fecha: '2023-11-02', tipo: 'Manual' },
   ]);
 
-  // Función para manejar la edición de proyectos
+  // Función para generar un nuevo código de proyecto automáticamente
+  const generateProjectCode = () => {
+    const year = new Date().getFullYear().toString().slice(-2);
+    const lastProject = proyectos[proyectos.length - 1];
+    const lastNumber = lastProject ? parseInt(lastProject.codigo.split('/')[1]) : 1000;
+    const newNumber = lastNumber + 1;
+    return `IN/${newNumber}/${year}`;
+  };
+
+  // Función para abrir el modal de nuevo proyecto y generar el código
+  const handleOpenNewProjectModal = () => {
+    setNewProject({
+      codigo: generateProjectCode(),
+      cliente: '',
+      correo: '',
+      fechaInicio: '',
+      fechaTermino: '',
+      estado: '',
+      inversion: '',
+    });
+    setShowNewProjectModal(true);
+  };
+
+  // Función para guardar el nuevo proyecto
+  const handleSaveNewProject = () => {
+    if (
+      newProject.codigo &&
+      newProject.cliente &&
+      newProject.fechaInicio &&
+      newProject.fechaTermino
+    ) {
+      setProyectos([...proyectos, newProject]);
+      setShowNewProjectModal(false);
+    } else {
+      alert('Por favor, completa todos los campos obligatorios.');
+    }
+  };
+
   const handleEditProject = (project) => {
     setEditingProject(project);
     setShowEditModal(true);
   };
 
-  // Función para eliminar un proyecto y sus documentos asociados
   const handleDeleteProject = (projectCode) => {
     if (window.confirm("¿Desea eliminar el proyecto y todos sus documentos?")) {
       setProyectos(proyectos.filter(proj => proj.codigo !== projectCode));
@@ -43,12 +89,6 @@ const Proyectos = () => {
     }
   };
 
-  // Función para eliminar solo los documentos asociados a un proyecto
-  const handleDeleteAllDocuments = (projectCode) => {
-    setDocuments(documents.filter(doc => doc.projectCode !== projectCode));
-  };
-
-  // Función para guardar los cambios en el proyecto editado
   const handleSaveProject = () => {
     setProyectos(proyectos.map(proj => 
       proj.codigo === editingProject.codigo ? editingProject : proj
@@ -62,7 +102,9 @@ const Proyectos = () => {
     <div className="proyectos-app">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1 className="mb-0">Administración Proyectos</h1>
-        <Button variant="dark">Nuevo Proyecto</Button>
+        <Button variant="dark" onClick={handleOpenNewProjectModal}>
+          Nuevo Proyecto
+        </Button>
       </div>
 
       <Form.Group className="mb-3">
@@ -107,9 +149,6 @@ const Proyectos = () => {
                     </Button>{' '}
                     <Button variant="danger" size="sm" onClick={() => handleDeleteProject(proyecto.codigo)}>
                       <FaTrash /> Eliminar
-                    </Button>{' '}
-                    <Button variant="outline-danger" size="sm" onClick={() => handleDeleteAllDocuments(proyecto.codigo)}>
-                      <FaTrash /> Eliminar Documentos
                     </Button>
                   </td>
                 </tr>
@@ -151,75 +190,73 @@ const Proyectos = () => {
         </Card.Body>
       </Card>
 
-      <footer className="footer-img-container mt-4">
-        <img src="/logo.png" alt="RosenmannLopez" className="footer-img" />
-      </footer>
-
-      {editingProject && (
-        <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Editar Proyecto</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form.Group>
-              <Form.Label>Cliente</Form.Label>
-              <Form.Control
-                type="text"
-                value={editingProject.cliente}
-                onChange={(e) => setEditingProject({ ...editingProject, cliente: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Correo</Form.Label>
-              <Form.Control
-                type="email"
-                value={editingProject.correo}
-                onChange={(e) => setEditingProject({ ...editingProject, correo: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Fecha Inicio</Form.Label>
-              <Form.Control
-                type="date"
-                value={editingProject.fechaInicio}
-                onChange={(e) => setEditingProject({ ...editingProject, fechaInicio: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Fecha Término</Form.Label>
-              <Form.Control
-                type="date"
-                value={editingProject.fechaTermino}
-                onChange={(e) => setEditingProject({ ...editingProject, fechaTermino: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Estado</Form.Label>
-              <Form.Control
-                type="text"
-                value={editingProject.estado}
-                onChange={(e) => setEditingProject({ ...editingProject, estado: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Inversión</Form.Label>
-              <Form.Control
-                type="text"
-                value={editingProject.inversion}
-                onChange={(e) => setEditingProject({ ...editingProject, inversion: e.target.value })}
-              />
-            </Form.Group>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-              Cancelar
-            </Button>
-            <Button variant="primary" onClick={handleSaveProject}>
-              Guardar Cambios
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      )}
+      <Modal show={showNewProjectModal} onHide={() => setShowNewProjectModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Nuevo Proyecto</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group>
+            <Form.Label>Código</Form.Label>
+            <Form.Control type="text" value={newProject.codigo} readOnly />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Cliente</Form.Label>
+            <Form.Control
+              type="text"
+              value={newProject.cliente}
+              onChange={(e) => setNewProject({ ...newProject, cliente: e.target.value })}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Correo</Form.Label>
+            <Form.Control
+              type="email"
+              value={newProject.correo}
+              onChange={(e) => setNewProject({ ...newProject, correo: e.target.value })}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Fecha Inicio</Form.Label>
+            <Form.Control
+              type="date"
+              value={newProject.fechaInicio}
+              onChange={(e) => setNewProject({ ...newProject, fechaInicio: e.target.value })}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Fecha Término</Form.Label>
+            <Form.Control
+              type="date"
+              value={newProject.fechaTermino}
+              onChange={(e) => setNewProject({ ...newProject, fechaTermino: e.target.value })}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Estado</Form.Label>
+            <Form.Control
+              type="text"
+              value={newProject.estado}
+              onChange={(e) => setNewProject({ ...newProject, estado: e.target.value })}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Inversión</Form.Label>
+            <Form.Control
+              type="text"
+              value={newProject.inversion}
+              onChange={(e) => setNewProject({ ...newProject, inversion: e.target.value })}
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowNewProjectModal(false)}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={handleSaveNewProject}>
+            Guardar Proyecto
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
