@@ -140,13 +140,13 @@ AUTH_USER_MODEL = "user.User"
 
 # CORS configuration
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Dominio de desarrollo del frontend en React
+    "http://localhost:3002",  # Dominio de desarrollo del frontend en React
 ]
 CORS_ALLOW_CREDENTIALS = True
 
 # Additional Security Settings (recommended for production)
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",  # Ajustar según el dominio en producción
+    "http://localhost:3002",  # Ajustar según el dominio en producción
 ]
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"

@@ -257,6 +257,10 @@ const Proyectos = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <footer className="mt-4 footer-img-container">
+        <img src="/logo.png" alt="Footer Logo" className="footer-img" />
+      </footer>
     </div>
   );
 };

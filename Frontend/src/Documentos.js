@@ -32,15 +32,15 @@ const Documentos = () => {
   const [selectedProject, setSelectedProject] = useState('');
   const [selectedFolder, setSelectedFolder] = useState('');
   const [selectedDocumentType, setSelectedDocumentType] = useState('');
+  const [uploadedFile, setUploadedFile] = useState(null);
 
-  // Estado para proyectos y carpetas simulados
-  const [proyectos] = useState([
-    { id: 1, nombre: 'Proyecto A' },
-    { id: 2, nombre: 'Proyecto B' },
-    { id: 3, nombre: 'Proyecto C' },
+  const [proyectos, setProyectos] = useState([
+    { id: 1, name: 'Proyecto A' },
+    { id: 2, name: 'Proyecto B' },
+    { id: 3, name: 'Proyecto C' },
   ]);
 
-  const [carpetas] = useState(['Cerrados', 'En Etapa 3', 'Activos', 'Finalizados', 'Recientes', 'En Proceso']);
+  const [carpetas, setCarpetas] = useState(['Cerrados', 'En Etapa 3', 'Activos', 'Finalizados', 'Recientes', 'En Proceso']);
 
   const handleSortAlphabetically = () => {
     const sortedDocuments = [...documents].sort((a, b) =>
@@ -66,62 +66,72 @@ const Documentos = () => {
     setSearchTerm(e.target.value);
   };
 
-  const filteredDocuments = documents.filter((doc) =>
-    doc.doc.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Funciones para modales
-  const openCreateFolderModal = () => setShowCreateFolderModal(true);
-  const closeCreateFolderModal = () => setShowCreateFolderModal(false);
-
-  const handleCreateFolder = () => {
-    if (newFolderName && selectedProject) {
-      const selectedProjectName = proyectos.find((p) => p.id === selectedProject)?.nombre;
-      const newFolder = { folder: newFolderName, doc: '', client: selectedProjectName, date: '', type: 'Carpeta' };
-      setDocuments([...documents, newFolder]);
-      closeCreateFolderModal();
-      setNewFolderName('');
-      setSelectedProject('');
-    } else {
-      alert("Por favor, completa todos los campos.");
-    }
-  };
-
-  // Función para abrir el modal de subir documento
   const handleUploadDocument = (docType) => {
     setSelectedDocumentType(docType);
     setShowUploadDocumentModal(true);
   };
 
-  const closeUploadDocumentModal = () => setShowUploadDocumentModal(false);
+  const handleFileDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    setUploadedFile(file);
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    setUploadedFile(file);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const closeUploadDocumentModal = () => {
+    setUploadedFile(null);
+    setSelectedFolder('');
+    setShowUploadDocumentModal(false);
+  };
 
   const handleConfirmUpload = () => {
-    if (selectedFolder) {
+    if (selectedFolder && uploadedFile) {
       const newDocument = {
         folder: selectedFolder,
-        doc: `${selectedDocumentType} nuevo`,
+        doc: uploadedFile.name,
         client: 'Cliente X',
         date: new Date().toISOString().split('T')[0],
-        type: selectedDocumentType
+        type: selectedDocumentType,
       };
       setDocuments([...documents, newDocument]);
       closeUploadDocumentModal();
-      setSelectedFolder('');
     } else {
-      alert("Selecciona una carpeta para subir el documento.");
+      alert('Selecciona una carpeta y un archivo para subir.');
     }
   };
+
+  const handleCreateFolder = () => {
+    if (newFolderName && selectedProject) {
+      const projectName = proyectos.find((p) => p.id === parseInt(selectedProject))?.name || '';
+      const newFolder = `${projectName}/${newFolderName}`;
+      setCarpetas([...carpetas, newFolder]);
+      setShowCreateFolderModal(false);
+      setNewFolderName('');
+      setSelectedProject('');
+    } else {
+      alert('Selecciona un proyecto y escribe un nombre para la carpeta.');
+    }
+  };
+
+  const filteredDocuments = documents.filter((doc) =>
+    doc.doc.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="documentos-app d-flex">
       <Col xs={12} className="main-content p-4">
-        
-        {/* Header with Title */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h1 className="mb-0">Administración Documentos</h1>
         </div>
 
-        {/* Action Buttons */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div>
             <Button variant="outline-secondary" className="me-2" onClick={handleSortAlphabetically}>
@@ -130,24 +140,23 @@ const Documentos = () => {
             <Button variant="outline-secondary" className="me-2" onClick={handleSortByDate}>
               Ordenar por Fecha {isSortedByDate ? 'Ascendente' : 'Descendente'}
             </Button>
-            <Dropdown onSelect={handleUploadDocument}>
+            <Dropdown>
               <Dropdown.Toggle variant="secondary" id="dropdown-basic">
                 <FaUpload /> Subir documento
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                <Dropdown.Item eventKey="Informe">Informe</Dropdown.Item>
-                <Dropdown.Item eventKey="Plano">Plano</Dropdown.Item>
-                <Dropdown.Item eventKey="Excel">Excel</Dropdown.Item>
-                <Dropdown.Item eventKey="Presentación">Presentación</Dropdown.Item>
+                <Dropdown.Item onClick={() => handleUploadDocument('Informe')}>Informe</Dropdown.Item>
+                <Dropdown.Item onClick={() => handleUploadDocument('Plano')}>Plano</Dropdown.Item>
+                <Dropdown.Item onClick={() => handleUploadDocument('Excel')}>Excel</Dropdown.Item>
+                <Dropdown.Item onClick={() => handleUploadDocument('Presentación')}>Presentación</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           </div>
-          <Button variant="dark" onClick={openCreateFolderModal}>
+          <Button variant="dark" onClick={() => setShowCreateFolderModal(true)}>
             <FaFolderPlus /> Crear carpeta
           </Button>
         </div>
 
-        {/* Search Bar */}
         <div className="search-container mb-4">
           <Form.Control
             type="text"
@@ -158,7 +167,6 @@ const Documentos = () => {
           />
         </div>
 
-        {/* Documents Table with Scroll */}
         <Card>
           <Card.Body>
             <div className="table-scroll">
@@ -196,9 +204,6 @@ const Documentos = () => {
                             <Dropdown.Item href="#/rename">
                               <FaPencilAlt /> Cambiar nombre
                             </Dropdown.Item>
-                            <Dropdown.Item href="#/edit">
-                              <FaEdit /> Editar
-                            </Dropdown.Item>
                             <Dropdown.Item href="#/delete" className="text-danger">
                               <FaTrash /> Borrar
                             </Dropdown.Item>
@@ -213,13 +218,12 @@ const Documentos = () => {
           </Card.Body>
         </Card>
 
-        {/* Modal para Crear Carpeta */}
-        <Modal show={showCreateFolderModal} onHide={closeCreateFolderModal}>
+        <Modal show={showCreateFolderModal} onHide={() => setShowCreateFolderModal(false)}>
           <Modal.Header closeButton>
-            <Modal.Title>Crear Carpeta Nueva</Modal.Title>
+            <Modal.Title>Crear Carpeta</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form.Group controlId="folderName">
+            <Form.Group>
               <Form.Label>Nombre de la Carpeta</Form.Label>
               <Form.Control
                 type="text"
@@ -227,7 +231,7 @@ const Documentos = () => {
                 onChange={(e) => setNewFolderName(e.target.value)}
               />
             </Form.Group>
-            <Form.Group controlId="selectProject" className="mt-3">
+            <Form.Group className="mt-3">
               <Form.Label>Seleccionar Proyecto</Form.Label>
               <Form.Control
                 as="select"
@@ -237,14 +241,14 @@ const Documentos = () => {
                 <option value="">Selecciona un proyecto</option>
                 {proyectos.map((proyecto) => (
                   <option key={proyecto.id} value={proyecto.id}>
-                    {proyecto.nombre}
+                    {proyecto.name}
                   </option>
                 ))}
               </Form.Control>
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={closeCreateFolderModal}>
+            <Button variant="secondary" onClick={() => setShowCreateFolderModal(false)}>
               Cancelar
             </Button>
             <Button variant="primary" onClick={handleCreateFolder}>
@@ -253,13 +257,12 @@ const Documentos = () => {
           </Modal.Footer>
         </Modal>
 
-        {/* Modal para Subir Documento */}
         <Modal show={showUploadDocumentModal} onHide={closeUploadDocumentModal}>
           <Modal.Header closeButton>
             <Modal.Title>Subir {selectedDocumentType}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form.Group controlId="selectFolder">
+            <Form.Group>
               <Form.Label>Seleccionar Carpeta</Form.Label>
               <Form.Control
                 as="select"
@@ -274,6 +277,25 @@ const Documentos = () => {
                 ))}
               </Form.Control>
             </Form.Group>
+            <div
+              onDrop={handleFileDrop}
+              onDragOver={handleDragOver}
+              style={{
+                border: '2px dashed #ccc',
+                borderRadius: '5px',
+                padding: '20px',
+                textAlign: 'center',
+                marginTop: '20px',
+                cursor: 'pointer',
+              }}
+            >
+              {uploadedFile ? (
+                <p>{uploadedFile.name}</p>
+              ) : (
+                <p>Arrastra un archivo aquí o haz clic para seleccionar</p>
+              )}
+              <Form.Control type="file" onChange={handleFileSelect} style={{ display: 'none' }} />
+            </div>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={closeUploadDocumentModal}>
@@ -285,9 +307,8 @@ const Documentos = () => {
           </Modal.Footer>
         </Modal>
 
-        {/* Footer with Logo */}
         <footer className="mt-4 footer-img-container">
-          <img src="/logo.png" alt="Footer" className="footer-img" />
+          <img src="/logo.png" alt="Footer Logo" className="footer-img" />
         </footer>
       </Col>
     </div>
