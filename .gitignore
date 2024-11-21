@@ -166,3 +166,5 @@ cython_debug/
 actions-runner/
 
 .idea/
+
+.scannerwork/scanner-report/

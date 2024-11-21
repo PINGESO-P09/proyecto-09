@@ -26,12 +26,12 @@ jobs:
 
       - name: SQ Backend Scan
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_GLOBAL_REPO }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_PROJECT }}
         run: |
           sonar-scanner -X "-Dsonar.token=$SONAR_TOKEN"
 
       - name: SQ Frontend Scan
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_GLOBAL_REPO }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_PROJECT }}
         run: |
           sonar-scanner -X "-Dsonar.token=$SONAR_TOKEN"
