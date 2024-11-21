@@ -5,10 +5,12 @@ on:
     branches:
       - main
       - sonarqube-automation
+      - code-quality-fixes
   pull_request:
     branches:
       - main
       - sonarqube-automation
+      - code-quality-fixes
 
 jobs:
   sonarQube:
