@@ -1,18 +1,17 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
 import json
 from .createfolder import create_folder
 from .uploadfile import upload_file
 
 @api_view(['POST'])
+@require_http_methods(["POST"])
 def login_or_register(request):
     """
     Vista que permite iniciar sesión o registrar un usuario.
@@ -54,6 +53,7 @@ def login_or_register(request):
                     status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
+@require_http_methods(["POST"])
 def create_drive_folder(request):
     """
     Vista para crear una carpeta en Google Drive.
@@ -74,7 +74,8 @@ def create_drive_folder(request):
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 @api_view(['POST'])
-def uploadDriveFiles(request):
+@require_http_methods(["POST"])
+def upload_drive_files(request):
     """
     Clase para manejar la subida de múltiples archivos a Google Drive.
     """
