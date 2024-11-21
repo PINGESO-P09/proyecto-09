@@ -28,10 +28,10 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_PROJECT }}
         run: |
-          sonar-scanner "-Dsonar.token=$SONAR_TOKEN"
+          sonar-scanner -X
 
       - name: SQ Frontend Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_PROJECT }}
         run: |
-          sonar-scanner "-Dsonar.token=$SONAR_TOKEN"
+          sonar-scanner -X
